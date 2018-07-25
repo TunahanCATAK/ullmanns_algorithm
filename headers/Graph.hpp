@@ -9,18 +9,25 @@
 #include "Vertice.hpp"
 
 class Graph {
+private:
+    bool m_isDirected = false; //false for a bidirected graph, true for a directed graph.
+
 public:
-    std::vector<const Vertice*> m_vertices;
+    std::vector<Vertice*> m_vertices;
     Graph(size_t numberOfNodes): m_numberOfNodes(numberOfNodes)
     {
-        m_vertices.resize(m_numberOfNodes);
+        InitializeVerticeVector();
     };
 
+    Graph(size_t numberOfNodes, bool isDirected): m_numberOfNodes(numberOfNodes), m_isDirected(isDirected) {
+        InitializeVerticeVector();
+    };
 
+    void AddEdge(Vertice*, Vertice*);
 
 private:
     size_t  m_numberOfNodes;
-
+    void InitializeVerticeVector();
 };
 
 

@@ -4,17 +4,14 @@
 #include <algorithm>
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
-
     Graph* graph;
-
-    size_t nodeNumber = 4;
-
+    size_t nodeNumber;
     std::ifstream in("../data/graph1.txt");
+
     in >> nodeNumber;
     if (!in.fail())
     {
-        graph = new Graph(nodeNumber);
+        graph = new Graph(nodeNumber, false);
 
         while(!in.eof())
         {
@@ -22,7 +19,10 @@ int main() {
             in >> x1;
             in >> x2;
 
-//            auto pos = std::find_if(graph->m_vertices.begin(), graph->m_vertices.end(), [](Vertice& elem){ return (elem.getId() == (size_t)x1); });
+            Vertice *to = graph->m_vertices.at(x1);
+            Vertice *from = graph->m_vertices.at(x2);
+
+            graph->AddEdge(to, from);
         }
     }
     else
@@ -30,6 +30,16 @@ int main() {
         std::cout << "node number read operation failed." << std::endl;
     }
 
+    for (auto& el : graph->m_vertices){ //why auto&
+
+        std::cout << el->getId() << "(Degree: " << el->getDegree() << ")" << std::endl;
+
+        for (auto& neigh: el->getNeigborhood())
+        {
+            std::cout << neigh->getId() << ", ";
+        }
+        std::cout << '\n';
+    }
 
     return 0;
 }

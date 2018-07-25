@@ -11,12 +11,15 @@ class Vertice{
 private:
     int m_id;
     int m_degree;
-    std::vector<const Vertice*> m_adjacencyList;
+    std::vector<Vertice*> m_adjacencyList;
 
 public:
     explicit Vertice(int id): m_id(id) { m_degree = 0; };
-    void addNeigborhood(const Vertice&);
-    int getId(void);
+    void addNeigborhood(Vertice*);
+
+    const std::vector<Vertice *> getNeigborhood(void) const;
+    const int getId(void) const;
+    const int getDegree(void) const;
 };
 
 

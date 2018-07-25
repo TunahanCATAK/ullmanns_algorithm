@@ -14,12 +14,18 @@ private:
     std::vector<Vertice*> m_adjacencyList;
 
 public:
+    //constructors:
     explicit Vertice(int id): m_id(id) { m_degree = 0; };
-    void addNeigborhood(Vertice*);
 
-    const std::vector<Vertice *> getNeigborhood(void) const;
+    //getters:
+    const std::vector<Vertice*> getNeigborhood(void) const;
     const int getId(void) const;
     const int getDegree(void) const;
+
+    //operator overloadings:
+    bool operator< (const Vertice&, const Vertice&);
+
+    void addNeigborhood(Vertice*);
 };
 
 

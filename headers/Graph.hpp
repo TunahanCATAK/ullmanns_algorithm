@@ -14,17 +14,20 @@ private:
 
 public:
     std::vector<Vertice*> m_vertices;
+
+    //constructors:
     Graph(size_t numberOfNodes): m_numberOfNodes(numberOfNodes)
     {
         InitializeVerticeVector();
     };
 
-    Graph(size_t numberOfNodes, bool isDirected): m_numberOfNodes(numberOfNodes), m_isDirected(isDirected) {
+    Graph(size_t numberOfNodes, bool isDirected): m_numberOfNodes(numberOfNodes), m_isDirected(isDirected)
+    {
         InitializeVerticeVector();
     };
 
     void AddEdge(Vertice*, Vertice*);
-
+    void SortVertices(void);
 private:
     size_t  m_numberOfNodes;
     void InitializeVerticeVector();

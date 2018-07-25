@@ -22,3 +22,7 @@ void Vertice::addNeigborhood(Vertice *node) {
 const int Vertice::getDegree(void) const {
     return m_degree;
 }
+
+bool Vertice::operator<(const Vertice &lhs, const Vertice &rhs) {
+    return lhs.m_degree < rhs.m_degree;
+}

@@ -1,9 +1,15 @@
 #include <iostream>
 #include <fstream>
 #include "headers/Graph.hpp"
+#include "headers/GraphMaker.hpp"
 #include <algorithm>
+#include <map>
+
+
+std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph*, Graph*);
 
 int main() {
+/*
     Graph* graph;
     size_t nodeNumber;
     std::ifstream in("../data/graph1.txt");
@@ -29,6 +35,23 @@ int main() {
     {
         std::cout << "node number read operation failed." << std::endl;
     }
+*/
+
+    Graph* subGraph = GraphMaker::CreateAGraph("../data/graph1.txt");
+
+    Graph* graph = GraphMaker::CreateAGraph("../data/graph2.txt");
+
+    std::map<Vertice*, std::vector<Vertice*>> matrix;
+
+    std::pair<Vertice*, std::vector<Vertice*>> firstPair;
+    firstPair.first = new Vertice(3);
+    firstPair.second = std::vector(5, new Vertice(2));
+
+    matrix.insert(firstPair);
+
+
+
+
 
     for (auto& el : graph->m_vertices){ //why auto&
 
@@ -43,3 +66,8 @@ int main() {
 
     return 0;
 }
+
+std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph*, Graph*)
+{
+
+};

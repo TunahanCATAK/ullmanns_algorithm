@@ -3,14 +3,13 @@
 //
 
 #include "../headers/Graph.hpp"
+#include <algorithm>
 
 void Graph::InitializeVerticeVector() {
-
     for(unsigned int i = 0; i < m_numberOfNodes; i++){
         Vertice* tempVertice = new Vertice(i);
         m_vertices.push_back(tempVertice);
     }
-
 }
 
 void Graph::AddEdge(Vertice *to, Vertice *from) {
@@ -23,5 +22,9 @@ void Graph::AddEdge(Vertice *to, Vertice *from) {
         to->addNeigborhood(from);
         from->addNeigborhood(to);
     }
+}
+
+void Graph::SortVertices(void) {
+    std::sort(std::begin(m_vertices), std::end(m_vertices));
 }
 

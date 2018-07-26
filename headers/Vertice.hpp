@@ -23,7 +23,7 @@ public:
     const int getDegree(void) const;
 
     //operator overloadings:
-    bool operator< (const Vertice&, const Vertice&);
+    friend bool operator<(const Vertice&, const Vertice&);
 
     void addNeigborhood(Vertice*);
 };

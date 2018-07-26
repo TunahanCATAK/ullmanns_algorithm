@@ -41,6 +41,8 @@ int main() {
 
     Graph* graph = GraphMaker::CreateAGraph("../data/graph2.txt");
 
+    std::sort(std::begin(graph->m_vertices), std::end(graph->m_vertices));
+/*
     std::map<Vertice*, std::vector<Vertice*>> matrix;
 
     std::pair<Vertice*, std::vector<Vertice*>> firstPair;
@@ -48,10 +50,7 @@ int main() {
     firstPair.second = std::vector(5, new Vertice(2));
 
     matrix.insert(firstPair);
-
-
-
-
+*/
 
     for (auto& el : graph->m_vertices){ //why auto&
 

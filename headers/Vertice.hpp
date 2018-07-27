@@ -23,10 +23,11 @@ public:
     const int getDegree(void) const;
 
     //operator overloadings:
-    friend bool operator<(const Vertice&, const Vertice&);
+    bool operator<(const Vertice& rhs) const { return this->m_degree < rhs.m_degree; }
 
     void addNeigborhood(Vertice*);
 };
+
 
 
 #endif //ULLMANNS_ALGORITHM_VERTICE_HPP

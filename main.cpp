@@ -14,11 +14,22 @@ bool cmpVertice(const Vertice *s1, const Vertice *s2){
     return s1->getDegree() < s2->getDegree();
 }
 
-int main() {
+int main(int args, char **argv) {
 
-    Graph* subGraph = GraphMaker::CreateAGraph("../data/graph1.txt");
+    if (args != 3){
+        return -1;
+    }
 
-    Graph* graph = GraphMaker::CreateAGraph("../data/graph2.txt");
+/*
+ * //Debug Info:
+    std::cout << argv[1] << std::endl;
+    std::cout << argv[2] << std::endl;
+
+*/
+
+    Graph* subGraph = GraphMaker::CreateAGraph(argv[1]);
+
+    Graph* graph = GraphMaker::CreateAGraph(argv[2]);
 
 /*
     //Debug Infos:
@@ -50,9 +61,10 @@ int main() {
 
     cand_hashtable = refineCandidateMatrix(&cand_hashtable);
 
-/*
+
+/*    //Debug Info:
     std::cout << "-------------After Refinement Process---------------" << std::endl;
-    //Debug Info:
+
     for (auto& el : cand_hashtable){
         std::cout << el.first->getId() << "-> ";
 
@@ -60,8 +72,8 @@ int main() {
             std::cout << cand->getId() << " - ";
         }
         std::cout << "\n";
-    }
-*/
+    }*/
+
 
 
     return 0;

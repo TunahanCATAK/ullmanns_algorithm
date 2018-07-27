@@ -9,6 +9,9 @@
 
 std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph*, Graph*);
 std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>>*);
+void findIsomoprhism(std::map<Vertice*, std::vector<Vertice*>>);
+std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice*, Vertice*, std::map<Vertice*, std::vector<Vertice*>>*);
+bool stopOrContinue(std::map<Vertice*, std::vector<Vertice*>>*);
 
 bool cmpVertice(const Vertice *s1, const Vertice *s2){
     return s1->getDegree() < s2->getDegree();
@@ -24,11 +27,9 @@ int main(int args, char **argv) {
  * //Debug Info:
     std::cout << argv[1] << std::endl;
     std::cout << argv[2] << std::endl;
-
 */
 
     Graph* subGraph = GraphMaker::CreateAGraph(argv[1]);
-
     Graph* graph = GraphMaker::CreateAGraph(argv[2]);
 
 /*
@@ -43,11 +44,10 @@ int main(int args, char **argv) {
         }
         std::cout << '\n';
     }
-
  */
     auto cand_hashtable = findCandidatesForSubGraph(subGraph, graph);
 
-/*
+
     //Debug Info:
     for (auto& el : cand_hashtable){
         std::cout << el.first->getId() << "-> ";
@@ -56,13 +56,12 @@ int main(int args, char **argv) {
             std::cout << cand->getId() << " - ";
         }
         std::cout << "\n";
-    }*/
-
+    }
 
     cand_hashtable = refineCandidateMatrix(&cand_hashtable);
 
 
-/*    //Debug Info:
+    //Debug Info:
     std::cout << "-------------After Refinement Process---------------" << std::endl;
 
     for (auto& el : cand_hashtable){
@@ -72,9 +71,9 @@ int main(int args, char **argv) {
             std::cout << cand->getId() << " - ";
         }
         std::cout << "\n";
-    }*/
+    }
 
-
+    findIsomoprhism(cand_hashtable);
 
     return 0;
 }
@@ -144,20 +143,67 @@ std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice
         pair_new_cand_ht.second = new_candidate_vertices;
         new_candidate_ht.insert(pair_new_cand_ht);
     }
+    return new_candidate_ht;
+}
 
-/*
+void findIsomoprhism(std::map<Vertice*, std::vector<Vertice*>> candidate_ht)
+{
+    for (auto &pair: candidate_ht) {
+        Vertice* sub_graph_vertice = pair.first;
+        for (auto &cand_of_sub_graph_vertice: pair.second){
+            std::map<Vertice*, std::vector<Vertice*>> new_cand_ht = pickACandidate(sub_graph_vertice, cand_of_sub_graph_vertice, &candidate_ht);
+            new_cand_ht = refineCandidateMatrix(&new_cand_ht);
 
-    std::cout << "-------------Inside Of Refinement Process---------------" << std::endl;
+            //Debug Info:
+            std::cout << "-------------After Refinement Process In findIsomorphism---------------" << std::endl;
+            for (auto& el : new_cand_ht){
+                std::cout << el.first->getId() << "-> ";
+
+                for (auto& cand: el.second){
+                    std::cout << cand->getId() << " - ";
+                }
+                std::cout << "\n";
+            }
+            // Debug Info End
+            bool pick_flag = stopOrContinue(&new_cand_ht);
+            std::cout << pick_flag << std::endl;
+        }
+    }
+}
+
+std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice* sub_graph_vertice, Vertice* graph_vertice, std::map<Vertice*, std::vector<Vertice*>> *candidate_ht)
+{
+    std::map<Vertice*, std::vector<Vertice*>> new_candidate_ht = *candidate_ht;
+
+    new_candidate_ht.find(sub_graph_vertice)->second = std::vector<Vertice*>(1, graph_vertice);
+    for (auto& item: new_candidate_ht){
+        if (item.first != sub_graph_vertice)
+        {
+            item.second.erase(std::remove(std::begin(item.second), std::end(item.second), graph_vertice),std::end(item.second));
+        }
+    }
+
     //Debug Info:
-    for (auto &el : new_candidate_ht) {
+    std::cout << "-------------After Delete Candidate Process In pickACandidate---------------" << std::endl;
+    for (auto& el : new_candidate_ht){
         std::cout << el.first->getId() << "-> ";
 
-        for (auto &cand: el.second) {
+        for (auto& cand: el.second){
             std::cout << cand->getId() << " - ";
         }
         std::cout << "\n";
     }
-*/
 
     return new_candidate_ht;
+
+};
+
+bool stopOrContinue(std::map<Vertice*, std::vector<Vertice*>>* candidate_ht)
+{
+    for(auto& item: *candidate_ht){
+        if (item.second.size() == 0)
+            return false;
+    }
+
+    return true;
 }

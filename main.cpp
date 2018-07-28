@@ -54,6 +54,7 @@ int main(int args, char **argv) {
     auto cand_hashtable = findCandidatesForSubGraph(subGraph, graph);
 
 
+/*
     //Debug Info:
     for (auto& el : cand_hashtable){
         std::cout << el.first->getId() << "-> ";
@@ -63,10 +64,12 @@ int main(int args, char **argv) {
         }
         std::cout << "\n";
     }
+*/
 
     cand_hashtable = refineCandidateMatrix(&cand_hashtable);
 
 
+/*
     //Debug Info:
     std::cout << "-------------After Refinement Process---------------" << std::endl;
 
@@ -78,13 +81,10 @@ int main(int args, char **argv) {
         }
         std::cout << "\n";
     }
+*/
 
     int result = matchAndContinue(&cand_hashtable, 0, 0);
-    if (result == -1)
-        std::cout << "There is no isomorphism.." << std::endl;
-    else
-    {
-        //Debug Info:
+/*        //Debug Info:
         std::cout << "-------------Matched Nodes---------------" << std::endl;
 
         for (auto& el : cand_hashtable){
@@ -94,27 +94,30 @@ int main(int args, char **argv) {
                 std::cout << cand->getId() << " - ";
             }
             std::cout << "\n";
-        }
+        }*/
+
+    if (matched_nodes.size() == 0){
+        std::cout << "There is no isomorphism" << std::endl;
     }
+    else{
+        std::cout << "-------------------------------------------------" <<std::endl;
+        std::cout << "-------------------------------------------------" <<std::endl;
 
+        for (std::map<Vertice*, std::vector<Vertice*>> item: matched_nodes){
+            for (auto &el : item){
+                std::cout << el.first->getId() << "-> ";
 
-    std::cout << "-------------------------------------------------" <<std::endl;
-    std::cout << "-------------------------------------------------" <<std::endl;
-
-    for (std::map<Vertice*, std::vector<Vertice*>> item: matched_nodes){
-        for (auto &el : item){
-            std::cout << el.first->getId() << "-> ";
-
-            for (auto& cand: el.second){
-                std::cout << cand->getId() << " - ";
+                for (auto& cand: el.second){
+                    std::cout << cand->getId() << " - ";
+                }
+                std::cout << "\n";
             }
-            std::cout << "\n";
+            std::cout << "-----------------------------------" << std::endl;
         }
-        std::cout << "-----------------------------------" << std::endl;
-    }
 
-    std::cout << "-------------------------------------------------" <<std::endl;
-    std::cout << "-------------------------------------------------" <<std::endl;
+        std::cout << "-------------------------------------------------" <<std::endl;
+        std::cout << "-------------------------------------------------" <<std::endl;
+    }
 
     return 0;
 }
@@ -212,7 +215,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
             index_sub_graph_stack.pop();
             candidate_ht_stack.pop();
 
-            //Debug Info:
+/*            //Debug Info:
             std::cout << "-------------When Push Backed-1---------------" << std::endl;
 
             for (auto& el : *ht){
@@ -222,7 +225,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
                     std::cout << cand->getId() << " - ";
                 }
                 std::cout << "\n";
-            }
+            }*/
 
             return matchAndContinue(ht, i, j + 1);
         }
@@ -234,10 +237,12 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
     new_candidate_ht = refineCandidateMatrix(&new_candidate_ht);
     
     if (!StopCheck(&new_candidate_ht)){
-        std::cout << "Matched Node: " << sub_graph_vertice->getId() << " - " << graph_vertice->getId() << std::endl;
+//        std::cout << "Matched Node: " << sub_graph_vertice->getId() << " - " << graph_vertice->getId() << std::endl;
         index_graph_stack.push(index_graph);
         index_sub_graph_stack.push(index_sub_graph);
         candidate_ht_stack.push(candidate_ht);
+/*
+
         //Debug Info:
         std::cout << "-------------Pushed Hash--------------" << std::endl;
 
@@ -250,6 +255,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
             std::cout << "\n";
         }
         // Debug Info End.
+*/
 
         if (index_sub_graph == candidate_ht->size() - 1){
             matched_nodes.push_back(new_candidate_ht);
@@ -262,6 +268,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
             index_sub_graph_stack.pop();
             candidate_ht_stack.pop();
 
+/*
             //Debug Info:
             std::cout << "-------------When Push Backed---------------" << std::endl;
 
@@ -273,6 +280,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
                 }
                 std::cout << "\n";
             }
+*/
 
             return matchAndContinue(ht, i, j + 1);
 
@@ -282,7 +290,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
     }
     else
     {
-        std::cout << "No match, " << index_sub_graph << " - " << index_graph << std::endl;
+//        std::cout << "No match, " << index_sub_graph << " - " << index_graph << std::endl;
         return matchAndContinue(candidate_ht, index_sub_graph, index_graph + 1);
     }
     
@@ -301,6 +309,7 @@ std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice* sub_graph_vert
         }
     }
 
+/*
     //Debug Info:
     std::cout << "-------------After Delete Candidate Process In pickACandidate---------------" << std::endl;
     for (auto& el : new_candidate_ht){
@@ -311,6 +320,7 @@ std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice* sub_graph_vert
         }
         std::cout << "\n";
     }
+*/
 
     return new_candidate_ht;
 

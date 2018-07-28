@@ -69,7 +69,6 @@ int main(int args, char **argv) {
     cand_hashtable = refineCandidateMatrix(&cand_hashtable);
 
 
-/*
     //Debug Info:
     std::cout << "-------------After Refinement Process---------------" << std::endl;
 
@@ -81,7 +80,6 @@ int main(int args, char **argv) {
         }
         std::cout << "\n";
     }
-*/
 
     int result = matchAndContinue(&cand_hashtable, 0, 0);
 /*        //Debug Info:

@@ -5,17 +5,23 @@
 #include "headers/Vertice.hpp"
 #include <algorithm>
 #include <map>
+#include <stack>
 
 
 std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph*, Graph*);
 std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>>*);
-void findIsomoprhism(std::map<Vertice*, std::vector<Vertice*>>);
 std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice*, Vertice*, std::map<Vertice*, std::vector<Vertice*>>*);
-bool stopOrContinue(std::map<Vertice*, std::vector<Vertice*>>*);
+bool StopCheck(std::map<Vertice*, std::vector<Vertice*>>*);
+int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>>*, int, int);
 
 bool cmpVertice(const Vertice *s1, const Vertice *s2){
     return s1->getDegree() < s2->getDegree();
 }
+
+std::vector<std::map<Vertice*, std::vector<Vertice*>>> matched_nodes;
+std::stack<int> index_sub_graph_stack;
+std::stack<int> index_graph_stack;
+std::stack<std::map<Vertice*, std::vector<Vertice*>>*> candidate_ht_stack;
 
 int main(int args, char **argv) {
 
@@ -73,7 +79,42 @@ int main(int args, char **argv) {
         std::cout << "\n";
     }
 
-    findIsomoprhism(cand_hashtable);
+    int result = matchAndContinue(&cand_hashtable, 0, 0);
+    if (result == -1)
+        std::cout << "There is no isomorphism.." << std::endl;
+    else
+    {
+        //Debug Info:
+        std::cout << "-------------Matched Nodes---------------" << std::endl;
+
+        for (auto& el : cand_hashtable){
+            std::cout << el.first->getId() << "-> ";
+
+            for (auto& cand: el.second){
+                std::cout << cand->getId() << " - ";
+            }
+            std::cout << "\n";
+        }
+    }
+
+
+    std::cout << "-------------------------------------------------" <<std::endl;
+    std::cout << "-------------------------------------------------" <<std::endl;
+
+    for (std::map<Vertice*, std::vector<Vertice*>> item: matched_nodes){
+        for (auto &el : item){
+            std::cout << el.first->getId() << "-> ";
+
+            for (auto& cand: el.second){
+                std::cout << cand->getId() << " - ";
+            }
+            std::cout << "\n";
+        }
+        std::cout << "-----------------------------------" << std::endl;
+    }
+
+    std::cout << "-------------------------------------------------" <<std::endl;
+    std::cout << "-------------------------------------------------" <<std::endl;
 
     return 0;
 }
@@ -146,17 +187,35 @@ std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice
     return new_candidate_ht;
 }
 
-void findIsomoprhism(std::map<Vertice*, std::vector<Vertice*>> candidate_ht)
+int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, int index_sub_graph, int index_graph)
 {
-    for (auto &pair: candidate_ht) {
-        Vertice* sub_graph_vertice = pair.first;
-        for (auto &cand_of_sub_graph_vertice: pair.second){
-            std::map<Vertice*, std::vector<Vertice*>> new_cand_ht = pickACandidate(sub_graph_vertice, cand_of_sub_graph_vertice, &candidate_ht);
-            new_cand_ht = refineCandidateMatrix(&new_cand_ht);
+    std::map<Vertice*, std::vector<Vertice*>>::iterator it = candidate_ht->begin();
+
+    for (int i = 0; i < index_sub_graph; i++){
+        it++;
+    }
+    
+    Vertice* sub_graph_vertice = it->first;
+    std::vector<Vertice*> graph_vertices = it->second;
+    
+    if (graph_vertices.size() <= index_graph)
+    {
+        if (index_graph_stack.size() == 0)
+            return -1;
+        else{
+
+            int i = index_sub_graph_stack.top();
+            int j = index_graph_stack.top();
+            std::map<Vertice *, std::vector<Vertice *>> *ht = static_cast<std::map<Vertice *, std::vector<Vertice *>> *>(candidate_ht_stack.top());
+            //delete top elements:
+            index_graph_stack.pop();
+            index_sub_graph_stack.pop();
+            candidate_ht_stack.pop();
 
             //Debug Info:
-            std::cout << "-------------After Refinement Process In findIsomorphism---------------" << std::endl;
-            for (auto& el : new_cand_ht){
+            std::cout << "-------------When Push Backed-1---------------" << std::endl;
+
+            for (auto& el : *ht){
                 std::cout << el.first->getId() << "-> ";
 
                 for (auto& cand: el.second){
@@ -164,12 +223,71 @@ void findIsomoprhism(std::map<Vertice*, std::vector<Vertice*>> candidate_ht)
                 }
                 std::cout << "\n";
             }
-            // Debug Info End
-            bool pick_flag = stopOrContinue(&new_cand_ht);
-            std::cout << pick_flag << std::endl;
+
+            return matchAndContinue(ht, i, j + 1);
         }
     }
+
+    Vertice* graph_vertice = graph_vertices.at(index_graph);
+    
+    std::map<Vertice*, std::vector<Vertice*>> new_candidate_ht = pickACandidate(sub_graph_vertice, graph_vertice, candidate_ht);
+    new_candidate_ht = refineCandidateMatrix(&new_candidate_ht);
+    
+    if (!StopCheck(&new_candidate_ht)){
+        std::cout << "Matched Node: " << sub_graph_vertice->getId() << " - " << graph_vertice->getId() << std::endl;
+        index_graph_stack.push(index_graph);
+        index_sub_graph_stack.push(index_sub_graph);
+        candidate_ht_stack.push(candidate_ht);
+        //Debug Info:
+        std::cout << "-------------Pushed Hash--------------" << std::endl;
+
+        for (auto& el : *candidate_ht){
+            std::cout << el.first->getId() << "-> ";
+
+            for (auto& cand: el.second){
+                std::cout << cand->getId() << " - ";
+            }
+            std::cout << "\n";
+        }
+        // Debug Info End.
+
+        if (index_sub_graph == candidate_ht->size() - 1){
+            matched_nodes.push_back(new_candidate_ht);
+
+            int i = index_sub_graph_stack.top();
+            int j = index_graph_stack.top();
+            std::map<Vertice *, std::vector<Vertice *>> *ht = static_cast<std::map<Vertice *, std::vector<Vertice *>> *>(candidate_ht_stack.top());
+            //delete top elements:
+            index_graph_stack.pop();
+            index_sub_graph_stack.pop();
+            candidate_ht_stack.pop();
+
+            //Debug Info:
+            std::cout << "-------------When Push Backed---------------" << std::endl;
+
+            for (auto& el : *ht){
+                std::cout << el.first->getId() << "-> ";
+
+                for (auto& cand: el.second){
+                    std::cout << cand->getId() << " - ";
+                }
+                std::cout << "\n";
+            }
+
+            return matchAndContinue(ht, i, j + 1);
+
+        }
+
+        return matchAndContinue(&new_candidate_ht, index_sub_graph + 1, 0);
+    }
+    else
+    {
+        std::cout << "No match, " << index_sub_graph << " - " << index_graph << std::endl;
+        return matchAndContinue(candidate_ht, index_sub_graph, index_graph + 1);
+    }
+    
 }
+
 
 std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice* sub_graph_vertice, Vertice* graph_vertice, std::map<Vertice*, std::vector<Vertice*>> *candidate_ht)
 {
@@ -198,12 +316,12 @@ std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice* sub_graph_vert
 
 };
 
-bool stopOrContinue(std::map<Vertice*, std::vector<Vertice*>>* candidate_ht)
+bool StopCheck(std::map<Vertice*, std::vector<Vertice*>>* candidate_ht)
 {
     for(auto& item: *candidate_ht){
         if (item.second.size() == 0)
-            return false;
+            return true;
     }
 
-    return true;
+    return false;
 }

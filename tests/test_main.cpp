@@ -82,8 +82,8 @@ int main()
         second_graph.insert(temp_pair);
     }
 
-    for(auto i: first_graph){
-        second_graph.insert(i);
+    for(auto &i: first_graph){
+        second_graph.find(i.first)->second = i.second;
     }
 
     for (int i = 0; i < g_BIG_MAX_EDGE_SIZE; i++){

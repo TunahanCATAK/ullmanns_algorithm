@@ -9,7 +9,7 @@
 
 
 std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph*, Graph*);
-std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>>*);
+std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>>*, Vertice* = nullptr);
 std::map<Vertice*, std::vector<Vertice*>> pickACandidate(Vertice*, Vertice*, std::map<Vertice*, std::vector<Vertice*>>*);
 bool StopCheck(std::map<Vertice*, std::vector<Vertice*>>*);
 int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>>*, int, int);
@@ -146,9 +146,10 @@ std::map<Vertice*, std::vector<Vertice*>> findCandidatesForSubGraph(Graph* sub_g
     return candidate_hashtable;
 };
 
-std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht) {
+std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, Vertice* picked_node) {
     std::map<Vertice *, std::vector<Vertice *>> new_candidate_ht;
 
+    bool cont_check = picked_node == nullptr;
     for (auto &pair: *candidate_ht) {
         std::pair<Vertice *, std::vector<Vertice *>> pair_new_cand_ht;
         Vertice *sub_graph_vertice = pair.first;
@@ -156,6 +157,14 @@ std::map<Vertice*, std::vector<Vertice*>> refineCandidateMatrix(std::map<Vertice
         std::vector<Vertice *> new_candidate_vertices;
 
         std::vector<Vertice *> neighborhood_sub_graph_vertice = sub_graph_vertice->getNeigborhood();
+
+        if (!cont_check){
+            if (picked_node == sub_graph_vertice)
+                cont_check = true;
+            pair_new_cand_ht.second = candidate_ht->find(sub_graph_vertice)->second;
+            new_candidate_ht.insert(pair_new_cand_ht);
+            continue;
+        }
 
         for (auto &graph_vertice : pair.second) {
             std::vector<Vertice *> neighborhood_graph_vertice = graph_vertice->getNeigborhood();
@@ -232,14 +241,53 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
     Vertice* graph_vertice = graph_vertices.at(index_graph);
     
     std::map<Vertice*, std::vector<Vertice*>> new_candidate_ht = pickACandidate(sub_graph_vertice, graph_vertice, candidate_ht);
-    new_candidate_ht = refineCandidateMatrix(&new_candidate_ht);
-    
+
+    //Debug Info:
+    std::cout << "-------------New Hash After Picking( " << sub_graph_vertice->getId() << " - " << graph_vertice->getId()  << ")--------------" << std::endl;
+
+    for (auto& el : new_candidate_ht){
+        std::cout << el.first->getId() << "-> ";
+
+        for (auto& cand: el.second){
+            std::cout << cand->getId() << " - ";
+        }
+        std::cout << "\n";
+    }
+    // Debug Info End.
+    new_candidate_ht = refineCandidateMatrix(&new_candidate_ht, sub_graph_vertice);
+    //Debug Info:
+    std::cout << "-------------New Hash After Refinement Process--------------" << std::endl;
+
+    for (auto& el : new_candidate_ht){
+        std::cout << el.first->getId() << "-> ";
+
+        for (auto& cand: el.second){
+            std::cout << cand->getId() << " - ";
+        }
+        std::cout << "\n";
+    }
+    // Debug Info End.
+
+
     if (!StopCheck(&new_candidate_ht)){
-//        std::cout << "Matched Node: " << sub_graph_vertice->getId() << " - " << graph_vertice->getId() << std::endl;
+        std::cout << "Matched Node: " << sub_graph_vertice->getId() << " - " << graph_vertice->getId() << std::endl;
         index_graph_stack.push(index_graph);
         index_sub_graph_stack.push(index_sub_graph);
         candidate_ht_stack.push(candidate_ht);
-/*
+
+
+        //Debug Info:
+        std::cout << "-------------New Hash--------------" << std::endl;
+
+        for (auto& el : new_candidate_ht){
+            std::cout << el.first->getId() << "-> ";
+
+            for (auto& cand: el.second){
+                std::cout << cand->getId() << " - ";
+            }
+            std::cout << "\n";
+        }
+        // Debug Info End.
 
         //Debug Info:
         std::cout << "-------------Pushed Hash--------------" << std::endl;
@@ -253,7 +301,7 @@ int matchAndContinue(std::map<Vertice*, std::vector<Vertice*>> *candidate_ht, in
             std::cout << "\n";
         }
         // Debug Info End.
-*/
+
 
         if (index_sub_graph == candidate_ht->size() - 1){
             matched_nodes.push_back(new_candidate_ht);
